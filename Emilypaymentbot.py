@@ -1,9 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from fastapi import FastAPI, Request
 import logging
 from datetime import datetime
-from fastapi.responses import JSONResponse
 
 # Constants
 BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
@@ -19,46 +17,7 @@ PAYMENT_INFO = {
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("bot")
 
-# FastAPI App
-app = FastAPI()
-telegram_app = None
 START_TIME = datetime.now()
-
-
-@app.on_event("startup")
-async def startup_event():
-    global telegram_app
-    telegram_app = Application.builder().token(BOT_TOKEN).build()
-    telegram_app.add_handler(CommandHandler("start", start))
-    telegram_app.add_handler(CallbackQueryHandler(handle_payment, pattern="payment"))
-    telegram_app.add_handler(CallbackQueryHandler(confirm_payment, pattern="paid"))
-    telegram_app.add_handler(CallbackQueryHandler(handle_support, pattern="support"))
-
-    logger.info("Telegram Bot Initialized!")
-    await telegram_app.initialize()
-    await telegram_app.bot.delete_webhook()
-    await telegram_app.bot.set_webhook(WEBHOOK_URL)
-    await telegram_app.start()
-
-
-@app.post("/webhook")
-async def webhook(request: Request):
-    global telegram_app
-    update = Update.de_json(await request.json(), telegram_app.bot)
-    await telegram_app.process_update(update)
-    return {"status": "ok"}
-
-
-@app.get("/uptime")
-async def get_uptime():
-    current_time = datetime.now()
-    uptime_duration = current_time - START_TIME
-    return JSONResponse(content={
-        "status": "online",
-        "uptime": str(uptime_duration),
-        "start_time": START_TIME.strftime("%Y-%m-%d %H:%M:%S")
-    })
-
 
 # Start Command Handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -149,3 +108,22 @@ async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]),
         parse_mode="Markdown",
     )
+
+
+# Main Application
+async def main():
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    # Add Handlers
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(handle_payment, pattern="payment"))
+    application.add_handler(CallbackQueryHandler(confirm_payment, pattern="paid"))
+    application.add_handler(CallbackQueryHandler(handle_support, pattern="support"))
+
+    # Start Long Polling
+    logger.info("Bot is starting with long polling...")
+    await application.run_polling()
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
