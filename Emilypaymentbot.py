@@ -7,7 +7,6 @@ from fastapi.responses import JSONResponse
 
 # Constants
 BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
-WEBHOOK_URL = "https://bot-1-f2wh.onrender.com/webhook"
 SUPPORT_CONTACT = "@ZakiVip1"
 ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
