@@ -3,9 +3,9 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Cont
 import logging
 
 # Constants
-BOT_TOKEN = "YOUR_BOT_TOKEN"  # Replace with your Telegram bot token
-PAYPAL_EMAIL = "your-paypal-email@example.com"  # Replace with your PayPal email
-MEDIA_APP_LINK = "https://your-media-app-link.com"  # Replace with your media app link
+BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"  # Replace with your Telegram bot token
+PAYPAL_EMAIL = "onlyvipfan@outlook.com"  # Replace with your PayPal email
+MEDIA_APP_LINK = "https://google.com"  # Replace with your media app link
 
 # Logging Configuration
 logging.basicConfig(level=logging.INFO)
