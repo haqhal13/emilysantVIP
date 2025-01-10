@@ -14,11 +14,9 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
 # Payment Information
 PAYMENT_INFO = {
-    "shopify": {
-        "lifetime": "https://5fbqad-qz.myshopify.com/cart/50160363766106:1",
-    },
-    "media": "https://5fbqad-qz.myshopify.com/cart/50160363766106:1",  # Replace with your media app URL
+    "media": "https://example-media-app-link.com",  # Replace with your media app URL
     "paypal": "onlyvipfan@outlook.com",
+    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Replace with your crypto payment link
 }
 
 # Logging Configuration
@@ -34,90 +32,66 @@ START_TIME = datetime.now()
 # Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("Lifetime (£10.00)", callback_data="select_lifetime")],
         [InlineKeyboardButton("Media App", web_app=WebAppInfo(url=PAYMENT_INFO["media"]))],
+        [InlineKeyboardButton("PayPal Payment", callback_data="payment_paypal")],
+        [InlineKeyboardButton("Crypto Payment", callback_data="payment_crypto")],
         [InlineKeyboardButton("Support", callback_data="support")],
     ]
     await update.message.reply_text(
         "💎 **Welcome to the VIP Bot!**\n\n"
-        "💎 *Get lifetime access to thousands of creators!*\n"
-        "⚡ *Instant access to the VIP link sent directly to your email!*\n"
-        "⭐ *Don’t see the model you’re looking for? We’ll add them within 24–72 hours!*\n\n"
-        "📌 Got questions? VIP link not working? Contact support 🔍👀",
+        "⚡ Access our exclusive media app and payment options below.\n\n"
+        "📌 Got questions? Contact support 🔍👀",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown",
     )
 
 
-async def handle_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_paypal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
-    plan_text = "LIFETIME"
     keyboard = [
-        [InlineKeyboardButton("💳 Pay Now via Shopify", web_app=WebAppInfo(url=PAYMENT_INFO["shopify"]["lifetime"]))],
-        [InlineKeyboardButton("📧 PayPal Option", callback_data="payment_paypal")],
-        [InlineKeyboardButton("💬 Support", callback_data="support")],
+        [InlineKeyboardButton("✅ Thank You for Payment", callback_data="thank_you")],
         [InlineKeyboardButton("🔙 Go Back", callback_data="back")],
     ]
-
     message = (
-        f"⭐ You have chosen the **{plan_text}** plan.\n\n"
-        "💳 **Pay Now via Shopify:** Instant VIP access delivered to your email.\n"
-        "📧 **PayPal Option:** Manually processed, VIP link sent manually.\n\n"
-        "🎉 Choose your preferred payment method below and get access today!"
+        "💸 **Pay with PayPal!**\n\n"
+        "➡️ **Send Payment To:**\n"
+        f"`{PAYMENT_INFO['paypal']}`\n\n"
+        "✅ After completing the payment, click 'Thank You for Payment'."
     )
     await query.edit_message_text(
-        text=message, 
+        text=message,
         reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 
-async def handle_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
-    if query.data == "payment_paypal":
-        message = (
-            "💸 **Easy Payment with PayPal!**\n\n"
-            "➡️ **Send Payment To:**\n"
-            f"`{PAYMENT_INFO['paypal']}`\n\n"
-            "💎 **Lifetime Access:** **£10.00 GBP** 🎉\n\n"
-            "✅ Once payment is complete, click 'I've Paid' to confirm."
-        )
-        keyboard = [
-            [InlineKeyboardButton("✅ I've Paid", callback_data="paid")],
-            [InlineKeyboardButton("🔙 Go Back", callback_data="back")],
-        ]
-        await query.edit_message_text(
-            text=message,
-            reply_markup=InlineKeyboardMarkup(keyboard),
-            parse_mode="Markdown",
-        )
-
-
-async def confirm_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    username = query.from_user.username or "No Username"
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    keyboard = [
+        [InlineKeyboardButton("✅ Thank You for Payment", callback_data="thank_you")],
+        [InlineKeyboardButton("🔙 Go Back", callback_data="back")],
+    ]
+    message = (
+        "⚡ **Pay with Crypto!**\n\n"
+        "🔗 **Payment Link:**\n"
+        f"[Crypto Payment Link]({PAYMENT_INFO['crypto']})\n\n"
+        "✅ After completing the payment, click 'Thank You for Payment'."
+    )
     await query.edit_message_text(
-        text="✅ Payment received! Your VIP link will be sent soon.",
-        parse_mode="Markdown"
+        text=message,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="Markdown",
     )
 
-    # Notify admin
-    await context.bot.send_message(
-        chat_id=ADMIN_CHAT_ID,
-        text=(
-            f"📝 **Payment Notification**\n"
-            f"👤 **User:** @{username}\n"
-            f"📋 **Plan:** Lifetime\n"
-            f"🕒 **Time:** {current_time}"
-        ),
-        parse_mode="Markdown"
+
+async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(
+        text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly.",
+        parse_mode="Markdown",
     )
 
 
@@ -126,7 +100,7 @@ async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.edit_message_text(
         text=f"💬 Need help? Contact support at {SUPPORT_CONTACT}.",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 
@@ -141,9 +115,9 @@ async def startup_event():
     global telegram_app
     telegram_app = Application.builder().token(BOT_TOKEN).build()
     telegram_app.add_handler(CommandHandler("start", start))
-    telegram_app.add_handler(CallbackQueryHandler(handle_subscription, pattern="select_.*"))
-    telegram_app.add_handler(CallbackQueryHandler(handle_payment, pattern="payment_.*"))
-    telegram_app.add_handler(CallbackQueryHandler(confirm_payment, pattern="paid"))
+    telegram_app.add_handler(CallbackQueryHandler(handle_paypal, pattern="payment_paypal"))
+    telegram_app.add_handler(CallbackQueryHandler(handle_crypto, pattern="payment_crypto"))
+    telegram_app.add_handler(CallbackQueryHandler(handle_thank_you, pattern="thank_you"))
     telegram_app.add_handler(CallbackQueryHandler(handle_back, pattern="back"))
     telegram_app.add_handler(CallbackQueryHandler(handle_support, pattern="support"))
 
