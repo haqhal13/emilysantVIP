@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import logging
 import httpx
 from datetime import datetime
@@ -80,7 +80,6 @@ async def handle_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Further implementation here...
 
 
-# Startup Event
 @app.on_event("startup")
 async def startup_event():
     global telegram_app
@@ -94,14 +93,19 @@ async def startup_event():
 
     logger.info("Telegram Bot Initialized!")
 
-    # Uptime Monitoring
     async with httpx.AsyncClient() as client:
         response = await client.get(UPTIME_MONITOR_URL)
         logger.info(f"Uptime Monitoring Response: {response.status_code}")
 
-    # Start polling in a separate coroutine
-    import asyncio
-    asyncio.create_task(telegram_app.run_polling())
+    await telegram_app.initialize()
+
+
+@app.post("/webhook")
+async def webhook(request: Request):
+    global telegram_app
+    update = Update.de_json(await request.json(), telegram_app.bot)
+    await telegram_app.process_update(update)
+    return {"status": "ok"}
 
 
 @app.get("/uptime")
