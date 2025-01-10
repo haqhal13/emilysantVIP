@@ -32,14 +32,15 @@ START_TIME = datetime.now()
 # Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("Media App", web_app=WebAppInfo(url=PAYMENT_INFO["media"]))],
+        [InlineKeyboardButton("Apple Pay & Google Pay", web_app=WebAppInfo(url=PAYMENT_INFO["media"]))],
         [InlineKeyboardButton("PayPal Payment", callback_data="payment_paypal")],
         [InlineKeyboardButton("Crypto Payment", callback_data="payment_crypto")],
         [InlineKeyboardButton("Support", callback_data="support")],
     ]
     await update.message.reply_text(
-        "💎 **Welcome to the VIP Bot!**\n\n"
-        "⚡ Access our exclusive media app and payment options below.\n\n"
+        "💎 **HoneyPot & Emily Sant!**\n\n"
+        "⚡ 3 short videos included only ! Access our Tele group with payment options below.\n\n"
+        "⚡ Pay wih Apple Pay or Google Pay emailed instantly! .\n\n"
         "📌 Got questions? Contact support 🔍👀",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown",
