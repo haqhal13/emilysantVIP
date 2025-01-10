@@ -14,7 +14,7 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
 # Payment Information
 PAYMENT_INFO = {
-    "media": "https://example-media-app-link.com",  # Replace with your media app URL
+    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/9979702444378:1",  # Replace with your media app URL
     "paypal": "onlyvipfan@outlook.com",
     "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Replace with your crypto payment link
 }
@@ -40,6 +40,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "💎 **HoneyPot & Emily Sant!**\n\n"
         "⚡ 3 short videos included only ! Access our Tele group with payment options below.\n\n"
+        "⚡ ONLY £5 LIMITED TIME ! .\n\n"
         "⚡ Pay wih Apple Pay or Google Pay emailed instantly! .\n\n"
         "📌 Got questions? Contact support 🔍👀",
         reply_markup=InlineKeyboardMarkup(keyboard),
