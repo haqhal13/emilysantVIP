@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 import logging
 import httpx
 from datetime import datetime
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 # Constants
 BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
@@ -14,9 +14,9 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
 # Payment Information
 PAYMENT_INFO = {
-    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/9979702444378:1",  # Replace with your media app URL
+    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/9979702444378:1",  # Updated media app URL
     "paypal": "onlyvipfan@outlook.com",
-    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Replace with your crypto payment link
+    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Updated crypto payment link
 }
 
 # Logging Configuration
@@ -32,16 +32,16 @@ START_TIME = datetime.now()
 # Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("Apple Pay & Google Pay", web_app=WebAppInfo(url=PAYMENT_INFO["media"]))],
+        [InlineKeyboardButton("Apple Pay & Google Pay", web_app=WebAppInfo(url=PAYMENT_INFO["Apple Pay & Google Pay"]))],
         [InlineKeyboardButton("PayPal Payment", callback_data="payment_paypal")],
         [InlineKeyboardButton("Crypto Payment", callback_data="payment_crypto")],
         [InlineKeyboardButton("Support", callback_data="support")],
     ]
     await update.message.reply_text(
         "💎 **HoneyPot & Emily Sant!**\n\n"
-        "⚡ 3 short videos included only ! Access our Tele group with payment options below.\n\n"
-        "⚡ ONLY £5 LIMITED TIME ! .\n\n"
-        "⚡ Pay wih Apple Pay or Google Pay emailed instantly! .\n\n"
+        "⚡ 3 short videos included only! Access our Tele group with payment options below.\n\n"
+        "⚡ ONLY £5 LIMITED TIME!.\n\n"
+        "⚡ Pay with Apple Pay or Google Pay emailed instantly!.\n\n"
         "📌 Got questions? Contact support 🔍👀",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown",
@@ -92,7 +92,7 @@ async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(
-        text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly Show payment to @zakivip1 , if you paid with Apple Pay or Google Pay it has been emailed to you.",
+        text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly. Show payment to @zakivip1. If you paid with Apple Pay or Google Pay, it has been emailed to you.",
         parse_mode="Markdown",
     )
 
@@ -140,8 +140,13 @@ async def webhook(request: Request):
     return {"status": "ok"}
 
 
+@app.head("/uptime")
+async def uptime_head():
+    return Response(status_code=200)
+
+
 @app.get("/uptime")
-async def get_uptime():
+async def uptime_get():
     current_time = datetime.now()
     uptime_duration = current_time - START_TIME
     return JSONResponse(content={
