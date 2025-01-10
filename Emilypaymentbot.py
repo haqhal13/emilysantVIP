@@ -90,7 +90,7 @@ async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(
-        text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly.",
+        text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly Show payment to @zakivip1 , if you paid with Apple Pay or Google Pay it has been emailed to you.",
         parse_mode="Markdown",
     )
 
