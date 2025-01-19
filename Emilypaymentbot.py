@@ -39,7 +39,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
     await update.message.reply_text(
         "💎 **HoneyPot & Emily Sant!**\n\n"
-        "⚡ 3 short videos included only! Access our Tele group with payment options below.\n\n"
+        "⚡ 3 short videos + 1 lingerie pic included only! Access our Tele group with payment options below.\n\n"
         "⚡ ONLY £5 LIMITED TIME!.\n\n"
         "⚡ Pay with Apple Pay or Google Pay emailed instantly!.\n\n"
         "📌 Got questions? Contact support 🔍👀",
