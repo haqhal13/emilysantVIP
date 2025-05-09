@@ -4,9 +4,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import logging
 from datetime import datetime
+import os
+import requests
 
 # Constants
-BOT_TOKEN = "7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU"
+BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
+WEBHOOK_URL = "https://emilysantvip.onrender.com/webhook"  # Your deployed Render URL
 SUPPORT_CONTACT = "@ZakiVip1"
 ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
@@ -123,3 +126,12 @@ async def webhook(request: Request):
     update = Update.de_json(await request.json(), telegram_app.bot)
     await telegram_app.process_update(update)
     return {"status": "ok"}
+
+@app.get("/set-webhook")
+async def set_webhook():
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/setWebhook"
+    response = requests.post(url, data={"url": WEBHOOK_URL})
+    return JSONResponse(content={
+        "webhook_set": response.ok,
+        "telegram_response": response.json()
+    })
