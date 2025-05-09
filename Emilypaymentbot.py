@@ -7,7 +7,7 @@ from datetime import datetime
 from fastapi.responses import JSONResponse, Response
 
 # Constants
-BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
+BOT_TOKEN = "7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU"
 UPTIME_MONITOR_URL = "https://emilysantvip.onrender.com/uptime"
 SUPPORT_CONTACT = "@ZakiVip1"
 ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
