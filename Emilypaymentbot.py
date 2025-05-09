@@ -11,7 +11,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Cont
 load_dotenv()
 
 # Constants from environment
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU")
 SUPPORT_CONTACT = os.getenv("SUPPORT_CONTACT", "@ZakiVip1")
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "834523364"))
 
