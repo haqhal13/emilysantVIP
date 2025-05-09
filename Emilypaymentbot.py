@@ -1,37 +1,32 @@
-import os
-from datetime import datetime
-import logging
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import logging
+from datetime import datetime
 
-# Load environment variables from .env file
-load_dotenv()
+# Constants
+BOT_TOKEN = "7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU"
+SUPPORT_CONTACT = "@ZakiVip1"
+ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
-# Constants from environment
-BOT_TOKEN = os.getenv("7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU")
-SUPPORT_CONTACT = os.getenv("SUPPORT_CONTACT", "@ZakiVip1")
-ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "834523364"))
-
-# Payment Info (hardcoded or replace with env if preferred)
+# Payment Information
 PAYMENT_INFO = {
     "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
     "paypal": "@OFVIPFAN ON PAYPAL",
     "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",
 }
 
-# Logging setup
-logging.basicConfig(level=logging.INFO)
+# Logging Configuration
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("bot")
 
-# FastAPI app and global vars
+# FastAPI App
 app = FastAPI()
 telegram_app = None
 START_TIME = datetime.now()
 
-# Telegram bot handlers
+# Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("Apple Pay & Google Pay", web_app=WebAppInfo(url=PAYMENT_INFO["Apple Pay & Google Pay"]))],
@@ -56,10 +51,16 @@ async def handle_paypal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("✅ Thank You for Payment", callback_data="thank_you")],
         [InlineKeyboardButton("🔙 Go Back", callback_data="back")],
     ]
+    message = (
+        "💸 **Pay with PayPal!**\n\n"
+        "➡️ **Send Payment To:**\n"
+        f"`{PAYMENT_INFO['paypal']}`\n\n"
+        "✅ After completing the payment, click 'Thank You for Payment'."
+    )
     await query.edit_message_text(
-        text=f"💸 **Pay with PayPal!**\n\n➡️ **Send Payment To:**\n`{PAYMENT_INFO['paypal']}`\n\n✅ After completing the payment, click 'Thank You for Payment'.",
+        text=message,
         reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 async def handle_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -69,10 +70,16 @@ async def handle_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("✅ Thank You for Payment", callback_data="thank_you")],
         [InlineKeyboardButton("🔙 Go Back", callback_data="back")],
     ]
+    message = (
+        "⚡ **Pay with Crypto!**\n\n"
+        "🔗 **Payment Link:**\n"
+        f"[Crypto Payment Link]({PAYMENT_INFO['crypto']})\n\n"
+        "✅ After completing the payment, click 'Thank You for Payment'."
+    )
     await query.edit_message_text(
-        text=f"⚡ **Pay with Crypto!**\n\n🔗 [Crypto Payment Link]({PAYMENT_INFO['crypto']})\n\n✅ After completing the payment, click 'Thank You for Payment'.",
+        text=message,
         reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -80,7 +87,7 @@ async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.edit_message_text(
         text="✅ **Thank you for your payment!**\n\nOur team will process your request shortly. Show payment to @zakivip1. If you paid with Apple Pay or Google Pay, it has been emailed to you.",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -88,7 +95,7 @@ async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.edit_message_text(
         text=f"💬 Need help? Contact support at {SUPPORT_CONTACT}.",
-        parse_mode="Markdown"
+        parse_mode="Markdown",
     )
 
 async def handle_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -96,12 +103,10 @@ async def handle_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await start(query, context)
 
-# Startup hook
 @app.on_event("startup")
 async def startup_event():
     global telegram_app
     telegram_app = Application.builder().token(BOT_TOKEN).build()
-
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CallbackQueryHandler(handle_paypal, pattern="payment_paypal"))
     telegram_app.add_handler(CallbackQueryHandler(handle_crypto, pattern="payment_crypto"))
@@ -112,18 +117,9 @@ async def startup_event():
     logger.info("Telegram Bot Initialized!")
     await telegram_app.initialize()
 
-# Telegram webhook endpoint
 @app.post("/webhook")
-async def telegram_webhook(request: Request):
+async def webhook(request: Request):
     global telegram_app
     update = Update.de_json(await request.json(), telegram_app.bot)
     await telegram_app.process_update(update)
     return {"status": "ok"}
-
-# Health check route
-@app.get("/healthz")
-async def health_check():
-    return JSONResponse(content={
-        "status": "ok",
-        "uptime_seconds": (datetime.now() - START_TIME).total_seconds()
-    })
