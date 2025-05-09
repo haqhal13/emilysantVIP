@@ -14,9 +14,9 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
 # Payment Information
 PAYMENT_INFO = {
-    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",  # Updated media app URL
+    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
     "paypal": "@OFVIPFAN ON PAYPAL",
-    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Updated crypto payment link
+    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",
 }
 
 # Logging Configuration
@@ -28,7 +28,7 @@ app = FastAPI()
 telegram_app = None
 START_TIME = datetime.now()
 
-# Root route to avoid 404s on "/"
+# Root route to prevent 404s
 @app.get("/")
 async def root():
     return JSONResponse(content={"message": "Emily Sant Bot is live 🚀"})
@@ -130,9 +130,13 @@ async def startup_event():
 
     logger.info("Telegram Bot Initialized!")
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(UPTIME_MONITOR_URL)
-        logger.info(f"Uptime Monitoring Response: {response.status_code}")
+    # Gracefully handle Render's premature uptime check
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(UPTIME_MONITOR_URL, timeout=5.0)
+            logger.info(f"Uptime Monitoring Response: {response.status_code}")
+    except Exception as e:
+        logger.warning(f"Uptime check failed: {e}")
 
     await telegram_app.initialize()
 
