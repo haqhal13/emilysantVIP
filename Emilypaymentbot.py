@@ -1,33 +1,35 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 import logging
-import httpx
+import os
 from datetime import datetime
-from fastapi.responses import JSONResponse, Response
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Constants
-BOT_TOKEN = "7561766699:AAGjpzhb8zDqc2-VrnzvXZZnu2-nEqfoXVU"
-UPTIME_MONITOR_URL = "https://emilysantvip.onrender.com/uptime"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 SUPPORT_CONTACT = "@ZakiVip1"
-ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_CHAT_ID", "834523364"))
 
-# Payment Information
+# Payment Info
 PAYMENT_INFO = {
-    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",  # Updated media app URL
+    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
     "paypal": "@OFVIPFAN ON PAYPAL",
-    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",  # Updated crypto payment link
+    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",
 }
 
-# Logging Configuration
-logging.basicConfig(level=logging.DEBUG)
+# Logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bot")
 
-# FastAPI App
+# FastAPI app
 app = FastAPI()
 telegram_app = None
 START_TIME = datetime.now()
-
 
 # Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,13 +42,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "💎 **HoneyPot & Emily Sant!**\n\n"
         "⚡ 3 short videos + 1 lingerie pic included only! Access our Tele group with payment options below.\n\n"
-        "⚡ ONLY £5 LIMITED TIME!.\n\n"
-        "⚡ Pay with Apple Pay or Google Pay emailed instantly!.\n\n"
+        "⚡ ONLY £5 LIMITED TIME!\n\n"
+        "⚡ Pay with Apple Pay or Google Pay emailed instantly!\n\n"
         "📌 Got questions? Contact support 🔍👀",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown",
     )
-
 
 async def handle_paypal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -62,11 +63,8 @@ async def handle_paypal(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ After completing the payment, click 'Thank You for Payment'."
     )
     await query.edit_message_text(
-        text=message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown",
+        text=message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
     )
-
 
 async def handle_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -82,11 +80,8 @@ async def handle_crypto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "✅ After completing the payment, click 'Thank You for Payment'."
     )
     await query.edit_message_text(
-        text=message,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="Markdown",
+        text=message, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="Markdown"
     )
-
 
 async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -96,21 +91,17 @@ async def handle_thank_you(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
     )
 
-
 async def handle_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(
-        text=f"💬 Need help? Contact support at {SUPPORT_CONTACT}.",
-        parse_mode="Markdown",
+        text=f"💬 Need help? Contact support at {SUPPORT_CONTACT}.", parse_mode="Markdown"
     )
-
 
 async def handle_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     await start(query, context)
-
 
 @app.on_event("startup")
 async def startup_event():
@@ -124,17 +115,18 @@ async def startup_event():
     telegram_app.add_handler(CallbackQueryHandler(handle_support, pattern="support"))
 
     logger.info("Telegram Bot Initialized!")
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(UPTIME_MONITOR_URL)
-        logger.info(f"Uptime Monitoring Response: {response.status_code}")
-
     await telegram_app.initialize()
 
-
 @app.post("/webhook")
-async def webhook(request: Request):
+async def telegram_webhook(request: Request):
     global telegram_app
     update = Update.de_json(await request.json(), telegram_app.bot)
     await telegram_app.process_update(update)
     return {"status": "ok"}
+
+@app.get("/healthz")
+async def health_check():
+    return JSONResponse(content={
+        "status": "ok",
+        "uptime_seconds": (datetime.now() - START_TIME).total_seconds()
+    })
