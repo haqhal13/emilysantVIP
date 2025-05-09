@@ -14,7 +14,7 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 
 # Payment Information
 PAYMENT_INFO = {
-    "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
+    "Apple Pay & Google Pay": "https://nt9qev-td.myshopify.com/cart/55617772618102:1",
     "paypal": "Paypal Payments coming soon",
     "crypto": "Crypto Coming Soon",
 }
