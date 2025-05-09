@@ -4,23 +4,22 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import logging
 from datetime import datetime
-import os
 import requests
 
 # Constants
 BOT_TOKEN = "8189375655:AAHsnhP49ZHqEK04uaEtcPeh3alikBhfVeY"
-WEBHOOK_URL = "https://emilysantvip.onrender.com/webhook"  # Your deployed Render URL
+WEBHOOK_URL = "https://emilysantvip.onrender.com/webhook"  # Change if your domain differs
 SUPPORT_CONTACT = "@ZakiVip1"
-ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
+ADMIN_CHAT_ID = 834523364
 
-# Payment Information
+# Payment Info
 PAYMENT_INFO = {
     "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
     "paypal": "@OFVIPFAN ON PAYPAL",
     "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",
 }
 
-# Logging Configuration
+# Logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("bot")
 
@@ -29,7 +28,7 @@ app = FastAPI()
 telegram_app = None
 START_TIME = datetime.now()
 
-# Handlers
+# Telegram Bot Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("Apple Pay & Google Pay", web_app=WebAppInfo(url=PAYMENT_INFO["Apple Pay & Google Pay"]))],
@@ -106,6 +105,7 @@ async def handle_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await start(query, context)
 
+# Telegram Bot Initialization
 @app.on_event("startup")
 async def startup_event():
     global telegram_app
@@ -120,6 +120,7 @@ async def startup_event():
     logger.info("Telegram Bot Initialized!")
     await telegram_app.initialize()
 
+# Webhook Receiver
 @app.post("/webhook")
 async def webhook(request: Request):
     global telegram_app
@@ -127,6 +128,7 @@ async def webhook(request: Request):
     await telegram_app.process_update(update)
     return {"status": "ok"}
 
+# Webhook Setter
 @app.get("/set-webhook")
 async def set_webhook():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/setWebhook"
