@@ -15,8 +15,8 @@ ADMIN_CHAT_ID = 834523364  # Replace with the admin's chat ID
 # Payment Information
 PAYMENT_INFO = {
     "Apple Pay & Google Pay": "https://5fbqad-qz.myshopify.com/cart/50289205936474:1",
-    "paypal": "@OFVIPFAN ON PAYPAL",
-    "crypto": "https://t.me/+t5kEU2mSziQ1NTg0",
+    "paypal": "Paypal Payments coming soon",
+    "crypto": "Crypto Coming Soon",
 }
 
 # Logging Configuration
