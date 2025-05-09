@@ -3,3 +3,4 @@ uvicorn[standard]==0.32.1
 python-telegram-bot==20.3
 httpx==0.24.1
 python-dotenv==1.1.0
+gunicorn==21.2.0
