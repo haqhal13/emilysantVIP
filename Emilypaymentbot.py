@@ -28,6 +28,11 @@ app = FastAPI()
 telegram_app = None
 START_TIME = datetime.now()
 
+# Root route to avoid 404s on "/"
+@app.get("/")
+async def root():
+    return JSONResponse(content={"message": "Emily Sant Bot is live 🚀"})
+
 
 # Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
